@@ -46,7 +46,7 @@ public class Customer {
     @Column(nullable = false)
     private String phone;
 
-    @Column(nullable = false, length = 2)
+    @Column(length = 2)
     private String country;
 
     @Column(nullable = false)

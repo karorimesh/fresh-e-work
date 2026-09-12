@@ -76,6 +76,9 @@ public class CustomerService {
     }
 
     private NormalizedPhone normalizePhone(final String phone, final String country) {
+        if (phone == null || phone.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
+        }
         final String countryCode = normalizeCountryCode(country);
         if (countryCode == null && !phone.startsWith("+")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -80,8 +81,9 @@ class CustomerServiceTest {
 
         final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> customerService.create(customerDTO));
-        assertEquals("400 BAD_REQUEST \"Country is required when phone number is not in international format\"",
-                exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Country is required when phone number is not in international format",
+                exception.getReason());
         verify(customerRepository, never()).save(any(Customer.class));
     }
 
@@ -96,8 +98,8 @@ class CustomerServiceTest {
 
         final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> customerService.create(customerDTO));
-        assertEquals("400 BAD_REQUEST \"Phone number does not map to a supported country\"",
-                exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Phone number does not map to a supported country", exception.getReason());
         verify(customerRepository, never()).save(any(Customer.class));
     }
 
@@ -112,7 +114,23 @@ class CustomerServiceTest {
 
         final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> customerService.create(customerDTO));
-        assertEquals("400 BAD_REQUEST \"Invalid phone number for country\"", exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Invalid phone number for country", exception.getReason());
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void createShouldRejectMissingPhoneNumber() {
+        final CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstname("Jane");
+        customerDTO.setLastname("Doe");
+        customerDTO.setCountry("ZA");
+        customerDTO.setEmail("jane@example.com");
+
+        final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> customerService.create(customerDTO));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Phone number is required", exception.getReason());
         verify(customerRepository, never()).save(any(Customer.class));
     }
 
