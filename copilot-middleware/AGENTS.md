@@ -30,4 +30,5 @@ Run from the repository root:
 - Run the narrowest meaningful verification while iterating.
 - Keep changes task-scoped and preserve unrelated existing changes. When a required file is already modified, integrate with those changes.
 - Never commit production credentials. Keep secrets in environment variables or local, unversioned overrides.
+- For outbound HTTP integrations, prefer Spring `RestClient` with environment-driven base URLs, tokens, and version headers configured in `application.properties`.
 - Add concise, verifiable repository-wide guidance discovered during a task to `AGENTS.md`; omit task details and duplicate documentation.

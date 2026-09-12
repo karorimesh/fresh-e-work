@@ -1,36 +1,17 @@
-# Copilot Middleware
+🚀 From Ambiguous AI Tasks to Pull Requests
 
-This app was created with [Bootify.io](https://bootify.io/app/BQXYKV7I5KYE) - tips on working with the code [can be found here](https://bootify.io/next-steps/).
+I’ve been experimenting with an AI-driven engineering workflow that takes an ambiguous task and turns it into actionable software engineering work.
 
-## Development
+The workflow uses an AI enrichment agent to:
+→ Understand and clarify the initial task
+→ Add technical context and acceptance criteria
+→ Create a structured GitHub issue
+→ Assign the task to GitHub Copilot
+→ Generate code and tests
+→ Produce a pull request for human review
 
-During development it is recommended to use the profile `local`. In IntelliJ `-Dspring.profiles.active=local` can be added in the VM options of the Run Configuration after enabling this property in "Modify options". Create your own `application-local.properties` file to override settings for development.
+The goal is to move beyond simply using AI for code completion and explore agentic software engineering workflows where AI helps drive the entire journey from problem → understanding → implementation → review.
 
-Lombok must be supported by your IDE. For IntelliJ install the Lombok plugin and enable annotation processing - [learn more](https://bootify.io/next-steps/spring-boot-with-lombok.html).
+Ambiguous Task → AI Enrichment → Engineering Task → GitHub → Copilot → Pull Request → Human Review
 
-After starting the application it is accessible under `localhost:8080`.
-
-## Build
-
-The application can be built using the following command:
-
-```
-mvnw clean package
-```
-
-Start your application with the following command - here with the profile `production`:
-
-```
-java -Dspring.profiles.active=production -jar ./target/copilot-middleware-0.0.1-SNAPSHOT.jar
-```
-
-If required, a Docker image can be created with the Spring Boot plugin. Add `SPRING_PROFILES_ACTIVE=production` as environment variable when running the container.
-
-```
-mvnw spring-boot:build-image -Dspring-boot.build-image.imageName=io.bootify/copilot-middleware
-```
-
-## Further readings
-
-* [Maven docs](https://maven.apache.org/guides/index.html)  
-* [Spring Boot reference](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)  
+Still a POC, but it’s an interesting direction for how AI agents could reshape software development workflows. 🤖🚀
