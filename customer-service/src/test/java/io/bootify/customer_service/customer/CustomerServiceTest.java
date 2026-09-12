@@ -96,6 +96,22 @@ class CustomerServiceTest {
 
         final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> customerService.create(customerDTO));
+        assertEquals("400 BAD_REQUEST \"Phone number does not map to a supported country\"",
+                exception.getMessage());
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void createShouldRejectInternationalNumberWhenCountryDoesNotMatch() {
+        final CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstname("Jane");
+        customerDTO.setLastname("Doe");
+        customerDTO.setPhone("+27712345678");
+        customerDTO.setCountry("US");
+        customerDTO.setEmail("jane@example.com");
+
+        final ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> customerService.create(customerDTO));
         assertEquals("400 BAD_REQUEST \"Invalid phone number for country\"", exception.getMessage());
         verify(customerRepository, never()).save(any(Customer.class));
     }

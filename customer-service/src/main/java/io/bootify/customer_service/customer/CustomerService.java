@@ -86,20 +86,33 @@ public class CustomerService {
         }
         try {
             final Phonenumber.PhoneNumber parsedPhoneNumber = PHONE_NUMBER_UTIL.parse(phone, countryCode);
-            if (!PHONE_NUMBER_UTIL.isValidNumberForRegion(parsedPhoneNumber, countryCode)
-                    && !(countryCode == null && PHONE_NUMBER_UTIL.isValidNumber(parsedPhoneNumber))) {
+            final String parsedRegion = PHONE_NUMBER_UTIL.getRegionCodeForNumber(parsedPhoneNumber);
+            if (parsedRegion == null || !PHONE_NUMBER_UTIL.getSupportedRegions().contains(parsedRegion)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Phone number does not map to a supported country");
+            }
+            final boolean validForCountry = countryCode == null
+                    ? PHONE_NUMBER_UTIL.isValidNumber(parsedPhoneNumber)
+                    : phone.startsWith("+")
+                            ? PHONE_NUMBER_UTIL.isValidNumber(parsedPhoneNumber)
+                                    && countryCode.equals(parsedRegion)
+                            : PHONE_NUMBER_UTIL.isValidNumberForRegion(parsedPhoneNumber, countryCode);
+            if (!validForCountry) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number for country");
             }
             return new NormalizedPhone(
                     PHONE_NUMBER_UTIL.format(parsedPhoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164),
-                    PHONE_NUMBER_UTIL.getRegionCodeForNumber(parsedPhoneNumber));
+                    parsedRegion);
         } catch (final NumberParseException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number", ex);
         }
     }
 
     private String normalizeCountryCode(final String country) {
-        return country == null ? null : country.toUpperCase(Locale.ROOT);
+        if (country == null || country.isBlank()) {
+            return null;
+        }
+        return country.toUpperCase(Locale.ROOT);
     }
 
     private record NormalizedPhone(String phoneNumber, String countryCode) {
