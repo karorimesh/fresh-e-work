@@ -1,13 +1,21 @@
 package io.bootify.customer_service.customer;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import io.bootify.customer_service.util.NotFoundException;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
 public class CustomerService {
+
+    private static final PhoneNumberUtil PHONE_NUMBER_UTIL = PhoneNumberUtil.getInstance();
 
     private final CustomerRepository customerRepository;
 
@@ -52,16 +60,49 @@ public class CustomerService {
         customerDTO.setFirstname(customer.getFirstname());
         customerDTO.setLastname(customer.getLastname());
         customerDTO.setPhone(customer.getPhone());
+        customerDTO.setCountry(customer.getCountry());
         customerDTO.setEmail(customer.getEmail());
         return customerDTO;
     }
 
     private Customer mapToEntity(final CustomerDTO customerDTO, final Customer customer) {
+        final NormalizedPhone normalizedPhone = normalizePhone(customerDTO.getPhone(), customerDTO.getCountry());
         customer.setFirstname(customerDTO.getFirstname());
         customer.setLastname(customerDTO.getLastname());
-        customer.setPhone(customerDTO.getPhone());
+        customer.setPhone(normalizedPhone.phoneNumber());
+        customer.setCountry(normalizedPhone.countryCode());
         customer.setEmail(customerDTO.getEmail());
         return customer;
+    }
+
+    private NormalizedPhone normalizePhone(final String phone, final String country) {
+        final String countryCode = normalizeCountryCode(country);
+        if (countryCode == null && !phone.startsWith("+")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Country is required when phone number is not in international format");
+        }
+        if (countryCode != null && !PHONE_NUMBER_UTIL.getSupportedRegions().contains(countryCode)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported country code: " + countryCode);
+        }
+        try {
+            final Phonenumber.PhoneNumber parsedPhoneNumber = PHONE_NUMBER_UTIL.parse(phone, countryCode);
+            if (!PHONE_NUMBER_UTIL.isValidNumberForRegion(parsedPhoneNumber, countryCode)
+                    && !(countryCode == null && PHONE_NUMBER_UTIL.isValidNumber(parsedPhoneNumber))) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number for country");
+            }
+            return new NormalizedPhone(
+                    PHONE_NUMBER_UTIL.format(parsedPhoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164),
+                    PHONE_NUMBER_UTIL.getRegionCodeForNumber(parsedPhoneNumber));
+        } catch (final NumberParseException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number", ex);
+        }
+    }
+
+    private String normalizeCountryCode(final String country) {
+        return country == null ? null : country.toUpperCase(Locale.ROOT);
+    }
+
+    private record NormalizedPhone(String phoneNumber, String countryCode) {
     }
 
 }
