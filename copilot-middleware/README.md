@@ -15,3 +15,16 @@ The goal is to move beyond simply using AI for code completion and explore agent
 Ambiguous Task → AI Enrichment → Engineering Task → GitHub → Copilot → Pull Request → Human Review
 
 Still a POC, but it’s an interesting direction for how AI agents could reshape software development workflows. 🤖🚀
+
+
+@AITinkerers
+@OpenAI
+@CopilotKit
+@openrouter
+@exaailabs
+@auth0
+@ambiguousio
+@triggerdotdev
+@mozillaAI
+@googlecloud
+#AgentsEverywhere.
