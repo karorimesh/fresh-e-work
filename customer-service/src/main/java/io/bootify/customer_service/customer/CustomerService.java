@@ -85,7 +85,7 @@ public class CustomerService {
                     "Country is required when phone number is not in international format");
         }
         if (countryCode != null && !PHONE_NUMBER_UTIL.getSupportedRegions().contains(countryCode)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported country code: " + countryCode);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported country code");
         }
         try {
             final Phonenumber.PhoneNumber parsedPhoneNumber = PHONE_NUMBER_UTIL.parse(phone, countryCode);
