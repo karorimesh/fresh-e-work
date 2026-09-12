@@ -1,6 +1,7 @@
 package io.bootify.customer_service.customer;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,10 @@ public class CustomerDTO {
     @NotNull
     @Size(max = 255)
     private String phone;
+
+    @Size(min = 2, max = 2)
+    @Pattern(regexp = "[A-Za-z]{2}")
+    private String country;
 
     @NotNull
     @Size(max = 255)
